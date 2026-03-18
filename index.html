@@ -107,7 +107,7 @@
             view: 'name',
             playerName: localStorage.getItem('risMatchPlayerName') || '',
             score: 0, lastScore: 0, timer: 60, level: 1, target: 0, tiles: [], selIdx: null, 
-            isProcessing: false, combo: 0, lastCorrectTime: 0,
+            isProcessing: false, combo: 0, lastCorrectTime: 0, bestCombo: 0, pairsThisRun: 0,
             best: localStorage.getItem('risMatchBest') || 0,
             totalSolved: parseInt(localStorage.getItem('risMatchTotal')) || 0,
             darkMode: localStorage.getItem('risMatchDark') === 'true'
@@ -168,8 +168,10 @@
 
                     state.score += (10 * state.level * state.combo);
                     state.totalSolved++;
+                    state.pairsThisRun++;
                     state.timer = Math.min(state.timer + 2, 60); 
                     localStorage.setItem('risMatchTotal', state.totalSolved);
+                    if (state.combo > state.bestCombo) state.bestCombo = state.combo;
                     
                     tileEls[i].classList.add('correct');
                     tileEls[firstIdx].classList.add('correct');
@@ -204,9 +206,111 @@
         }
 
         // --- Sharing Functions ---
+        function generateScoreImage(callback) {
+            const canvas = document.createElement('canvas');
+            const W = 600, H = 680;
+            canvas.width = W; canvas.height = H;
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            const bg = ctx.createLinearGradient(0, 0, W, H);
+            bg.addColorStop(0, '#667eea'); bg.addColorStop(1, '#764ba2');
+            ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+            // Decorative circles
+            ctx.globalAlpha = 0.1;
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(520, 80, 180, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(80, 600, 140, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1;
+
+            // Top accent
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fillRect(0, 0, W, 5);
+
+            // Title
+            ctx.font = 'bold 52px "Arial Black", sans-serif';
+            ctx.fillStyle = 'white'; ctx.textAlign = 'center';
+            ctx.fillText('RisMatch', W/2, 75);
+
+            ctx.font = '17px Arial';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.fillText('Speed Challenge  •  ' + state.playerName, W/2, 105);
+
+            // Score
+            ctx.font = 'bold 110px "Arial Black", sans-serif';
+            ctx.fillStyle = 'white';
+            ctx.fillText(state.score, W/2, 240);
+            ctx.font = '18px Arial';
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.fillText('SCORE', W/2, 268);
+
+            // Stats row
+            const stats = [
+                { label: 'BEST', value: state.best, color: '#FFD700' },
+                { label: 'LEVEL', value: state.level, color: '#A8EDFF' },
+                { label: 'PAIRS', value: state.pairsThisRun, color: '#A8FFD4' },
+                { label: 'COMBO', value: state.bestCombo > 1 ? 'x'+state.bestCombo : '—', color: '#FFB347' },
+            ];
+            stats.forEach((s, i) => {
+                const x = 75 + i * 150;
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                roundRect(ctx, x-55, 295, 110, 75, 14); ctx.fill();
+                ctx.font = 'bold 26px Arial';
+                ctx.fillStyle = s.color; ctx.textAlign = 'center';
+                ctx.fillText(s.value, x, 333);
+                ctx.font = '11px Arial';
+                ctx.fillStyle = 'rgba(255,255,255,0.45)';
+                ctx.fillText(s.label, x, 352);
+            });
+
+            // Bar — solved total
+            const bY = 405, bW = W - 120;
+            ctx.font = '13px Arial'; ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.textAlign = 'left'; ctx.fillText('Total Pairs Solved', 60, bY);
+            ctx.textAlign = 'right'; ctx.fillText(state.totalSolved, W-60, bY);
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            roundRect(ctx, 60, bY+8, bW, 10, 5); ctx.fill();
+            const fill = Math.min(state.totalSolved / 200, 1);
+            if (fill > 0) {
+                ctx.fillStyle = '#A8FFD4';
+                roundRect(ctx, 60, bY+8, bW*fill, 10, 5); ctx.fill();
+            }
+
+            // CTA
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.textAlign = 'center';
+            ctx.fillText('Can you beat ' + state.playerName + '? 👉 rismath.github.io/rismatch', W/2, 480);
+
+            // Bottom accent
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fillRect(0, H-4, W, 4);
+
+            callback(canvas.toDataURL('image/png'));
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+            ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+            ctx.lineTo(x+w, y+h-r);
+            ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+            ctx.lineTo(x+r, y+h);
+            ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+            ctx.lineTo(x, y+r);
+            ctx.quadraticCurveTo(x, y, x+r, y);
+            ctx.closePath();
+        }
+
         function shareScore() {
-            const msg = `🧠 *RisMatch Speed Challenge!* ⚡\n\nI just scored *${state.score}*!\nCan you beat my speed? 🏁\n\n👤 Player: ${state.playerName}\n🌟 Best: ${state.best}\n🧩 Solved: ${state.totalSolved}\n\nPlay here: https://rismath.github.io/rismatch`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            const msg = `🧠 *RisMatch Speed Challenge!* ⚡\n\n👤 ${state.playerName}\n🎯 Score: *${state.score}*\n🏆 Best: ${state.best}\n🔥 Best Combo: ${state.bestCombo > 1 ? 'x'+state.bestCombo : '—'}\n🧩 Pairs: ${state.pairsThisRun}\n\nCan you beat me? 👇\nhttps://rismath.github.io/rismatch`;
+            // Try to download image first, then share text
+            generateScoreImage((dataURL) => {
+                const a = document.createElement('a');
+                a.href = dataURL; a.download = 'rismatch-score.png'; a.click();
+                setTimeout(() => {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+                }, 500);
+            });
         }
 
         function shareInvite() {
@@ -216,6 +320,7 @@
 
         function startGame() {
             state.view = 'play'; state.score = 0; state.timer = 60; state.level = 1; state.combo = 0;
+            state.bestCombo = 0; state.pairsThisRun = 0;
             document.body.classList.remove('panic');
             renderBase(); initLevelData(); renderPlayArea();
             const clock = setInterval(() => {
@@ -292,16 +397,43 @@
                     <div id="tiles-container" class="grid grid-cols-3 gap-4"></div>
                 </div>`;
             } else {
+                const isNew = state.score > 0 && state.score == state.best;
                 root.innerHTML = `
                 <div class="glass-card text-center">
-                    <h2 class="game-title text-3xl mb-4 text-indigo-900 dark:text-indigo-400">Run Complete</h2>
-                    <div class="game-title text-8xl text-indigo-600 mb-8">${state.score}</div>
+                    ${isNew ? `<div class="game-title text-2xl text-yellow-500 mb-1">🏆 New Best!</div>` : `<h2 class="game-title text-2xl mb-1 text-indigo-900 dark:text-indigo-400">Run Complete</h2>`}
+                    <div class="game-title text-8xl text-indigo-600 mb-4">${state.score}</div>
+
+                    <div class="grid grid-cols-3 gap-2 mb-5">
+                        <div class="bg-black/5 dark:bg-white/5 p-2.5 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-40 uppercase">Best</p>
+                            <p class="game-title text-xl ${isNew ? 'text-yellow-500' : 'text-indigo-600'}">${state.best}</p>
+                        </div>
+                        <div class="bg-black/5 dark:bg-white/5 p-2.5 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-40 uppercase">Level</p>
+                            <p class="game-title text-xl text-indigo-600">${state.level}</p>
+                        </div>
+                        <div class="bg-black/5 dark:bg-white/5 p-2.5 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-40 uppercase">Solved</p>
+                            <p class="game-title text-xl text-indigo-600">${state.totalSolved}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-6">
+                        <div class="bg-orange-500/10 p-2.5 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-50 uppercase">Best Combo</p>
+                            <p class="game-title text-xl text-orange-500">${state.bestCombo > 1 ? 'x' + state.bestCombo + ' 🔥' : '—'}</p>
+                        </div>
+                        <div class="bg-green-500/10 p-2.5 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-50 uppercase">This Run</p>
+                            <p class="game-title text-xl text-green-600">${state.pairsThisRun} pairs</p>
+                        </div>
+                    </div>
+
                     <div class="space-y-3">
                         <button onclick="shareScore()" class="whatsapp-btn font-bold"><span>🔥</span> Share My Score</button>
                         <button onclick="shareInvite()" class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-3 rounded-2xl w-full font-bold text-sm border border-indigo-200">📢 Invite Friends to Play</button>
                         <button onclick="startGame()" class="btn-modern game-title">RETRY</button>
                     </div>
-                    <button onclick="state.view='menu';renderBase()" class="mt-8 block w-full text-xs font-bold opacity-30 uppercase">Main Menu</button>
+                    <button onclick="state.view='menu';renderBase()" class="mt-6 block w-full text-xs font-bold opacity-30 uppercase">Main Menu</button>
                 </div>`;
             }
         }
