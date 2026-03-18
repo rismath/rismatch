@@ -7,114 +7,128 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.92);
-            --primary: #FF7E5F;
-            --secondary: #764BA2;
+        :root { 
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass: rgba(255, 255, 255, 0.95);
+            --text: #2D3436;
+            --tile: #F1F2F6;
+            --primary: #4834D4;
+        }
+
+        .dark {
+            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --glass: rgba(30, 30, 50, 0.95);
+            --text: #E0E0E0;
+            --tile: #252545;
+            --primary: #7661ff;
+        }
+
+        .panic {
+            animation: panicPulse 1s infinite alternate;
+        }
+        @keyframes panicPulse {
+            from { background: #764ba2; }
+            to { background: #e74c3c; }
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Nunito', sans-serif;
-            color: #2D3436;
+            background: var(--bg-gradient);
+            font-family: 'Nunito', sans-serif; color: var(--text);
             height: 100vh; overflow: hidden; touch-action: manipulation;
             display: flex; align-items: center; justify-content: center; margin: 0;
+            transition: background 0.5s ease;
         }
 
-        /* Modern Glass Card */
         .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 92%; max-width: 380px;
-            padding: 2rem;
-            position: relative;
-            z-index: 10;
+            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            width: 92%; max-width: 380px; padding: 2rem; position: relative; z-index: 10;
         }
 
-        /* Animated Background Blobs */
-        .blob {
-            position: absolute; width: 300px; height: 300px;
-            background: linear-gradient(to right, #FF7E5F, #FEB47B);
-            filter: blur(80px); border-radius: 50%; z-index: 1; opacity: 0.5;
-            animation: move 20s infinite alternate;
-        }
-        @keyframes move { from { transform: translate(-10%, -10%); } to { transform: translate(20%, 20%); } }
+        .game-title { font-family: 'Baloo 2', cursive; font-weight: 800; }
 
-        .game-title { font-family: 'Baloo 2', cursive; font-weight: 800; letter-spacing: -1px; }
-
-        /* Modern Tile System */
         .tile {
-            background: white;
-            border-radius: 1.2rem;
-            font-family: 'Baloo 2', cursive;
-            font-size: 2.2rem;
-            color: #4834D4;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 2px solid transparent;
+            background: var(--tile); border-radius: 1.2rem; font-family: 'Baloo 2', cursive;
+            font-size: 2.2rem; color: var(--primary); aspect-ratio: 1;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; user-select: none;
         }
-        
-        .tile:active { transform: scale(0.9); }
-        
-        .tile.selected {
-            background: #4834D4;
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(72, 52, 212, 0.3);
-        }
-
-        .tile.correct { background: #00B894 !important; color: white; transform: scale(0.95); opacity: 0.5; }
+        .tile.selected { background: var(--primary); color: white; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(72, 52, 212, 0.3); }
+        .tile.correct { background: #00B894 !important; color: white; transform: scale(0.9); opacity: 0; }
         .tile.error { background: #FF7675 !important; color: white; animation: shake 0.4s; }
 
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
         .btn-modern {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; border-radius: 1.2rem; padding: 1rem;
-            font-size: 1.4rem; font-weight: 900; width: 100%;
-            transition: all 0.2s; box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+            color: white; border-radius: 1.2rem; padding: 1.1rem; font-size: 1.4rem; font-weight: 900; width: 100%;
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
         }
-        .btn-modern:active { transform: scale(0.97); }
 
-        .progress-container { background: rgba(0,0,0,0.05); border-radius: 10px; height: 6px; overflow: hidden; }
-        .progress-bar { height: 100%; background: #4834D4; transition: width 1s linear; }
+        .whatsapp-btn {
+            background: #25D366; color: white; border-radius: 1.2rem; padding: 0.8rem;
+            font-weight: 800; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
 
-        /* Smooth UI transitions */
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-field {
+            background: rgba(0,0,0,0.05); border: 2px solid var(--primary); border-radius: 1rem;
+            padding: 0.8rem; width: 100%; text-align: center; font-weight: 800; font-size: 1.2rem;
+            margin-bottom: 1.5rem; outline: none;
+        }
+
+        .floating-text {
+            position: absolute; font-weight: 900; font-size: 1.2rem;
+            animation: floatUp 0.8s ease-out forwards; pointer-events: none; z-index: 100;
+        }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-50px); } }
     </style>
 </head>
-<body>
-    <div class="blob"></div>
+<body class="light">
     <div id="game-root" class="w-full flex justify-center p-4"></div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function sfx(f, t, d) {
-            try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
-                g.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
-                o.connect(g); g.connect(audioCtx.destination);
-                o.start(); o.stop(audioCtx.currentTime + d);
-            } catch(e) {}
+            try { if (audioCtx.state === 'suspended') audioCtx.resume();
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + d); } catch(e) {}
         }
 
         let state = {
-            view: 'menu', score: 0, timer: 60, level: 1, 
-            target: 0, tiles: [], selIdx: null,
+            view: 'name',
+            playerName: localStorage.getItem('risMatchPlayerName') || '',
+            score: 0, lastScore: 0, timer: 60, level: 1, target: 0, tiles: [], selIdx: null, 
+            isProcessing: false, combo: 0, lastCorrectTime: 0,
             best: localStorage.getItem('risMatchBest') || 0,
-            isProcessing: false 
+            totalSolved: parseInt(localStorage.getItem('risMatchTotal')) || 0,
+            darkMode: localStorage.getItem('risMatchDark') === 'true'
         };
 
-        function initLevel() {
+        if(state.darkMode) document.body.classList.add('dark');
+        if(state.playerName && state.view === 'name') state.view = 'menu';
+
+        function saveName() {
+            const val = document.getElementById('name-input').value.trim();
+            if(val) {
+                state.playerName = val;
+                localStorage.setItem('risMatchPlayerName', val);
+                state.view = 'menu'; renderBase();
+            }
+        }
+
+        function toggleTheme() {
+            state.darkMode = !state.darkMode;
+            document.body.classList.toggle('dark');
+            localStorage.setItem('risMatchDark', state.darkMode);
+            renderBase();
+        }
+
+        function initLevelData() {
             const range = 10 + (state.level * 8);
             state.target = Math.floor(Math.random() * range) + (10 + state.level * 2);
             let v1 = Math.floor(Math.random() * (state.target - 2)) + 1;
@@ -125,47 +139,91 @@
                 if(!vals.includes(d) && !vals.some(v => v + d === state.target)) vals.push(d);
             }
             state.tiles = vals.sort(() => Math.random() - 0.5).map(v => ({ v, status: 'idle' }));
-            state.selIdx = null;
-            state.isProcessing = false;
+            state.selIdx = null; state.isProcessing = false;
         }
 
         function handleTap(i) {
-            if (state.view !== 'play' || (state.isProcessing && state.tiles[i].status !== 'selected')) return;
-            if (state.selIdx === i) {
-                state.tiles[i].status = 'idle'; state.selIdx = null; render(); return;
-            }
+            if (state.isProcessing) return;
+            const tileEls = document.querySelectorAll('.tile');
+            if (state.selIdx === i) { state.selIdx = null; tileEls[i].classList.remove('selected'); return; }
+
             sfx(440, 'sine', 0.1);
             if (state.selIdx === null) {
-                state.selIdx = i; state.tiles[i].status = 'selected'; render();
+                state.selIdx = i; tileEls[i].classList.add('selected');
             } else {
                 state.isProcessing = true;
-                if (state.tiles[state.selIdx].v + state.tiles[i].v === state.target) {
+                const firstIdx = state.selIdx;
+                if (state.tiles[firstIdx].v + state.tiles[i].v === state.target) {
+                    // Success logic
+                    if (window.navigator.vibrate) window.navigator.vibrate(15);
                     sfx(880, 'sine', 0.1);
-                    state.score += (10 * state.level);
-                    state.tiles[i].status = 'correct'; state.tiles[state.selIdx].status = 'correct';
-                    render();
-                    setTimeout(() => { if (state.score % 100 === 0) state.level++; initLevel(); render(); }, 250);
+
+                    // Combo Logic
+                    const now = Date.now();
+                    if (now - state.lastCorrectTime < 3000) state.combo++;
+                    else state.combo = 1;
+                    state.lastCorrectTime = now;
+
+                    state.score += (10 * state.level * state.combo);
+                    state.totalSolved++;
+                    state.timer = Math.min(state.timer + 2, 60); 
+                    localStorage.setItem('risMatchTotal', state.totalSolved);
+                    
+                    tileEls[i].classList.add('correct');
+                    tileEls[firstIdx].classList.add('correct');
+                    
+                    showFloatingText(tileEls[i], `+2s ${state.combo > 1 ? '🔥 x'+state.combo : ''}`, state.combo > 1 ? '#F39C12' : '#00B894');
+
+                    setTimeout(() => {
+                        if (state.score > 0 && state.score % 150 === 0) state.level++;
+                        initLevelData(); renderPlayArea();
+                    }, 300);
                 } else {
-                    sfx(220, 'triangle', 0.2);
-                    state.tiles[i].status = 'error'; state.tiles[state.selIdx].status = 'error';
-                    render();
-                    let old = state.selIdx;
-                    setTimeout(() => { state.tiles[i].status = 'idle'; state.tiles[old].status = 'idle'; state.selIdx = null; state.isProcessing = false; render(); }, 500);
+                    // Error logic
+                    if (window.navigator.vibrate) window.navigator.vibrate([50, 30, 50]);
+                    sfx(150, 'sawtooth', 0.2);
+                    state.combo = 0;
+                    tileEls[i].classList.add('error'); tileEls[firstIdx].classList.add('error');
+                    setTimeout(() => {
+                        tileEls[i].classList.remove('error', 'selected');
+                        tileEls[firstIdx].classList.remove('error', 'selected');
+                        state.selIdx = null; state.isProcessing = false;
+                    }, 500);
                 }
             }
         }
 
+        function showFloatingText(el, text, color) {
+            const b = document.createElement('div');
+            b.className = 'floating-text'; b.innerText = text; b.style.color = color;
+            const rect = el.getBoundingClientRect();
+            b.style.left = `${rect.left + 10}px`; b.style.top = `${rect.top}px`;
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 800);
+        }
+
+        function shareToWhatsApp() {
+            const msg = `🧠 RisMatch Challenge!\n\n👤 Player: ${state.playerName}\n⚡ Score: ${state.score}\n🌟 Best: ${state.best}\n🧩 Solved: ${state.totalSolved}\n\nCan you beat my speed? Play here: [YOUR_LINK]`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
         function startGame() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            state.view = 'play'; state.score = 0; state.timer = 60; state.level = 1;
-            initLevel(); render();
+            state.view = 'play'; state.score = 0; state.timer = 60; state.level = 1; state.combo = 0;
+            document.body.classList.remove('panic');
+            renderBase(); initLevelData(); renderPlayArea();
             const clock = setInterval(() => {
                 if (state.view !== 'play') { clearInterval(clock); return; }
                 state.timer--;
+                
+                if(state.timer <= 10) document.body.classList.add('panic');
+                else document.body.classList.remove('panic');
+
                 if(state.timer <= 0) {
                     state.view = 'end';
+                    state.lastScore = state.score;
                     if(state.score > state.best) { state.best = state.score; localStorage.setItem('risMatchBest', state.score); }
-                    render();
+                    document.body.classList.remove('panic');
+                    renderBase();
                 } else {
                     document.getElementById('timer-val').innerText = state.timer + 's';
                     document.getElementById('progress-bar').style.width = (state.timer/60*100) + '%';
@@ -173,51 +231,70 @@
             }, 1000);
         }
 
-        function render() {
+        function renderPlayArea() {
+            const cont = document.getElementById('tiles-container');
+            if(!cont) return;
+            cont.innerHTML = state.tiles.map((t, i) => `<div onclick="handleTap(${i})" class="tile">${t.v}</div>`).join('');
+            document.getElementById('target-num').innerText = state.target;
+            document.getElementById('score-val').innerText = state.score;
+            document.getElementById('lvl-val').innerText = state.level;
+            if(state.combo > 1) document.getElementById('combo-badge').innerText = `COMBO x${state.combo} 🔥`;
+            else document.getElementById('combo-badge').innerText = '';
+        }
+
+        function renderBase() {
             const root = document.getElementById('game-root');
-            if (state.view === 'menu') {
+            if (state.view === 'name') {
                 root.innerHTML = `
-                <div class="glass-card text-center fade-in">
-                    <h1 class="game-title text-6xl text-indigo-900 mb-2">RisMatch</h1>
-                    <p class="text-indigo-500 font-bold mb-8 uppercase tracking-widest text-xs">The Next Gen Math Challenge</p>
-                    <div class="space-y-4 mb-8">
-                        <div class="flex items-center gap-4 bg-white/50 p-4 rounded-2xl">
-                            <span class="text-2xl">🎯</span>
-                            <p class="text-left text-sm font-bold opacity-70">Find two numbers that add up to the target.</p>
+                <div class="glass-card text-center">
+                    <h1 class="game-title text-5xl text-indigo-900 dark:text-indigo-400 mb-6">Welcome</h1>
+                    <p class="text-sm font-bold opacity-60 mb-6">Enter your name for the leaderboard!</p>
+                    <input type="text" id="name-input" class="input-field" placeholder="Player Name" maxlength="10">
+                    <button onclick="saveName()" class="btn-modern game-title">CONTINUE</button>
+                </div>`;
+            } else if (state.view === 'menu') {
+                root.innerHTML = `
+                <div class="glass-card text-center">
+                    <div class="absolute top-6 left-6 text-xs font-black opacity-40 uppercase tracking-tighter">Hi, ${state.playerName}</div>
+                    <div class="absolute top-4 right-6 cursor-pointer text-xl" onclick="toggleTheme()">${state.darkMode ? '☀️' : '🌙'}</div>
+                    <h1 class="game-title text-7xl text-indigo-900 dark:text-indigo-400 mt-6 mb-2">RisMatch</h1>
+                    <div class="grid grid-cols-2 gap-3 mb-8">
+                        <div class="bg-black/5 dark:bg-white/5 p-3 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-40 uppercase">Best</p><p class="game-title text-2xl">${state.best}</p>
                         </div>
+                        <div class="bg-black/5 dark:bg-white/5 p-3 rounded-2xl">
+                            <p class="text-[9px] font-black opacity-40 uppercase">Total Solved</p><p class="game-title text-2xl">${state.totalSolved}</p>
+                        </div>
+                        ${state.lastScore > 0 ? `<div class="bg-indigo-500/10 col-span-2 p-2 rounded-xl text-xs font-bold">Last Run: ${state.lastScore}</div>` : ''}
                     </div>
-                    <button onclick="startGame()" class="btn-modern game-title">START GAME</button>
-                    <div class="mt-6 text-[10px] font-black opacity-30 uppercase">High Score: ${state.best}</div>
+                    <button onclick="startGame()" class="btn-modern game-title">START DASH</button>
                 </div>`;
             } else if (state.view === 'play') {
                 root.innerHTML = `
-                <div class="glass-card fade-in">
-                    <div class="flex justify-between items-end mb-6">
-                        <div><p class="text-[10px] font-black opacity-30 uppercase">Score</p><p class="game-title text-2xl text-indigo-600">${state.score}</p></div>
-                        <div class="text-center"><p id="timer-val" class="game-title text-4xl text-indigo-900">${state.timer}s</p></div>
-                        <div class="text-right"><p class="text-[10px] font-black opacity-30 uppercase">Level</p><p class="game-title text-2xl text-indigo-600">${state.level}</p></div>
+                <div class="glass-card">
+                    <div class="flex justify-between items-end mb-4">
+                        <div><p class="text-[9px] font-black opacity-30 uppercase">Score</p><p id="score-val" class="game-title text-2xl text-indigo-600">0</p></div>
+                        <div class="text-center"><p id="timer-val" class="game-title text-4xl">60s</p><p id="combo-badge" class="text-[10px] font-black text-orange-500 h-2"></p></div>
+                        <div class="text-right"><p class="text-[9px] font-black opacity-30 uppercase">Level</p><p id="lvl-val" class="game-title text-2xl text-indigo-600">1</p></div>
                     </div>
-                    <div class="progress-container mb-8"><div id="progress-bar" class="progress-bar" style="width:${(state.timer/60)*100}%"></div></div>
-                    <div class="text-center mb-8">
-                        <p class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Target</p>
-                        <h2 class="game-title text-9xl text-indigo-900 -mt-2">${state.target}</h2>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        ${state.tiles.map((t, i) => `<div onclick="handleTap(${i})" class="tile ${t.status}">${t.v}</div>`).join('')}
-                    </div>
+                    <div class="bg-gray-200/20 rounded-full h-1.5 mb-8 overflow-hidden"><div id="progress-bar" class="bg-indigo-600 h-full w-full"></div></div>
+                    <div class="text-center mb-8"><p class="text-[10px] font-black opacity-30 uppercase tracking-widest">Target</p><h2 id="target-num" class="game-title text-9xl -mt-2">0</h2></div>
+                    <div id="tiles-container" class="grid grid-cols-3 gap-4"></div>
                 </div>`;
             } else {
                 root.innerHTML = `
-                <div class="glass-card text-center fade-in">
-                    <h2 class="game-title text-4xl text-indigo-900 mb-2">Well Played!</h2>
-                    <div class="text-xs font-black opacity-30 uppercase mb-8">You finished with</div>
-                    <div class="game-title text-8xl text-indigo-600 mb-10">${state.score}</div>
-                    <button onclick="startGame()" class="btn-modern game-title mb-4">TRY AGAIN</button>
-                    <button onclick="state.view='menu';render()" class="text-sm font-bold opacity-40">Main Menu</button>
+                <div class="glass-card text-center">
+                    <h2 class="game-title text-3xl mb-4">Time Up!</h2>
+                    <div class="game-title text-8xl text-indigo-600 mb-8">${state.score}</div>
+                    <div class="space-y-3">
+                        <button onclick="shareToWhatsApp()" class="whatsapp-btn font-bold">Share on WhatsApp</button>
+                        <button onclick="startGame()" class="btn-modern game-title">RETRY</button>
+                    </div>
+                    <button onclick="state.view='menu';renderBase()" class="mt-8 block w-full text-xs font-bold opacity-30 uppercase">Main Menu</button>
                 </div>`;
             }
         }
-        render();
+        renderBase();
     </script>
 </body>
 </html>
