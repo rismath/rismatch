@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RisMatch | Speed Challenge 🧠⚡</title>
+    
+    <meta property="og:title" content="RisMatch | 60s Speed Challenge">
+    <meta property="og:description" content="Match the pairs. Beat the clock. How fast is your brain?">
+    <meta property="og:url" content="https://rismath.github.io/rismatch">
+    <meta name="theme-color" content="#4834D4">
+
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -23,9 +29,7 @@
             --primary: #7661ff;
         }
 
-        .panic {
-            animation: panicPulse 1s infinite alternate;
-        }
+        .panic { animation: panicPulse 1s infinite alternate; }
         @keyframes panicPulse {
             from { background: #764ba2; }
             to { background: #e74c3c; }
@@ -74,7 +78,7 @@
         .input-field {
             background: rgba(0,0,0,0.05); border: 2px solid var(--primary); border-radius: 1rem;
             padding: 0.8rem; width: 100%; text-align: center; font-weight: 800; font-size: 1.2rem;
-            margin-bottom: 1.5rem; outline: none;
+            margin-bottom: 1.5rem; outline: none; color: var(--text);
         }
 
         .floating-text {
@@ -154,11 +158,9 @@
                 state.isProcessing = true;
                 const firstIdx = state.selIdx;
                 if (state.tiles[firstIdx].v + state.tiles[i].v === state.target) {
-                    // Success logic
                     if (window.navigator.vibrate) window.navigator.vibrate(15);
                     sfx(880, 'sine', 0.1);
 
-                    // Combo Logic
                     const now = Date.now();
                     if (now - state.lastCorrectTime < 3000) state.combo++;
                     else state.combo = 1;
@@ -179,7 +181,6 @@
                         initLevelData(); renderPlayArea();
                     }, 300);
                 } else {
-                    // Error logic
                     if (window.navigator.vibrate) window.navigator.vibrate([50, 30, 50]);
                     sfx(150, 'sawtooth', 0.2);
                     state.combo = 0;
@@ -202,8 +203,14 @@
             setTimeout(() => b.remove(), 800);
         }
 
-        function shareToWhatsApp() {
-            const msg = `🧠 RisMatch Challenge!\n\n👤 Player: ${state.playerName}\n⚡ Score: ${state.score}\n🌟 Best: ${state.best}\n🧩 Solved: ${state.totalSolved}\n\nCan you beat my speed? Play here: [YOUR_LINK]`;
+        // --- Sharing Functions ---
+        function shareScore() {
+            const msg = `🧠 *RisMatch Speed Challenge!* ⚡\n\nI just scored *${state.score}*!\nCan you beat my speed? 🏁\n\n👤 Player: ${state.playerName}\n🌟 Best: ${state.best}\n🧩 Solved: ${state.totalSolved}\n\nPlay here: https://rismath.github.io/rismatch`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function shareInvite() {
+            const msg = `🚀 *Check out RisMatch!* 🧠\n\nI've been playing this new speed-math dash. It's a 60-second challenge to match pairs. Super addictive!\n\nGive it a try: https://rismath.github.io/rismatch`;
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -225,8 +232,10 @@
                     document.body.classList.remove('panic');
                     renderBase();
                 } else {
-                    document.getElementById('timer-val').innerText = state.timer + 's';
-                    document.getElementById('progress-bar').style.width = (state.timer/60*100) + '%';
+                    const tVal = document.getElementById('timer-val');
+                    const pBar = document.getElementById('progress-bar');
+                    if(tVal) tVal.innerText = state.timer + 's';
+                    if(pBar) pBar.style.width = (state.timer/60*100) + '%';
                 }
             }, 1000);
         }
@@ -238,8 +247,8 @@
             document.getElementById('target-num').innerText = state.target;
             document.getElementById('score-val').innerText = state.score;
             document.getElementById('lvl-val').innerText = state.level;
-            if(state.combo > 1) document.getElementById('combo-badge').innerText = `COMBO x${state.combo} 🔥`;
-            else document.getElementById('combo-badge').innerText = '';
+            const badge = document.getElementById('combo-badge');
+            if(badge) badge.innerText = state.combo > 1 ? `COMBO x${state.combo} 🔥` : '';
         }
 
         function renderBase() {
@@ -248,7 +257,7 @@
                 root.innerHTML = `
                 <div class="glass-card text-center">
                     <h1 class="game-title text-5xl text-indigo-900 dark:text-indigo-400 mb-6">Welcome</h1>
-                    <p class="text-sm font-bold opacity-60 mb-6">Enter your name for the leaderboard!</p>
+                    <p class="text-sm font-bold opacity-60 mb-6">Enter your name for the scorecard!</p>
                     <input type="text" id="name-input" class="input-field" placeholder="Player Name" maxlength="10">
                     <button onclick="saveName()" class="btn-modern game-title">CONTINUE</button>
                 </div>`;
@@ -260,14 +269,15 @@
                     <h1 class="game-title text-7xl text-indigo-900 dark:text-indigo-400 mt-6 mb-2">RisMatch</h1>
                     <div class="grid grid-cols-2 gap-3 mb-8">
                         <div class="bg-black/5 dark:bg-white/5 p-3 rounded-2xl">
-                            <p class="text-[9px] font-black opacity-40 uppercase">Best</p><p class="game-title text-2xl">${state.best}</p>
+                            <p class="text-[9px] font-black opacity-40 uppercase">Best</p><p class="game-title text-2xl text-indigo-600">${state.best}</p>
                         </div>
                         <div class="bg-black/5 dark:bg-white/5 p-3 rounded-2xl">
-                            <p class="text-[9px] font-black opacity-40 uppercase">Total Solved</p><p class="game-title text-2xl">${state.totalSolved}</p>
+                            <p class="text-[9px] font-black opacity-40 uppercase">Total Solved</p><p class="game-title text-2xl text-indigo-600">${state.totalSolved}</p>
                         </div>
-                        ${state.lastScore > 0 ? `<div class="bg-indigo-500/10 col-span-2 p-2 rounded-xl text-xs font-bold">Last Run: ${state.lastScore}</div>` : ''}
+                        ${state.lastScore > 0 ? `<div class="bg-indigo-500/10 col-span-2 p-2 rounded-xl text-xs font-bold text-indigo-600">Last Score: ${state.lastScore}</div>` : ''}
                     </div>
                     <button onclick="startGame()" class="btn-modern game-title">START DASH</button>
+                    <button onclick="state.view='name';renderBase()" class="mt-4 text-[10px] font-bold opacity-30 uppercase">Change Name</button>
                 </div>`;
             } else if (state.view === 'play') {
                 root.innerHTML = `
@@ -277,17 +287,18 @@
                         <div class="text-center"><p id="timer-val" class="game-title text-4xl">60s</p><p id="combo-badge" class="text-[10px] font-black text-orange-500 h-2"></p></div>
                         <div class="text-right"><p class="text-[9px] font-black opacity-30 uppercase">Level</p><p id="lvl-val" class="game-title text-2xl text-indigo-600">1</p></div>
                     </div>
-                    <div class="bg-gray-200/20 rounded-full h-1.5 mb-8 overflow-hidden"><div id="progress-bar" class="bg-indigo-600 h-full w-full"></div></div>
+                    <div class="bg-gray-200/20 rounded-full h-1.5 mb-8 overflow-hidden"><div id="progress-bar" class="bg-indigo-600 h-full w-full transition-all duration-1000"></div></div>
                     <div class="text-center mb-8"><p class="text-[10px] font-black opacity-30 uppercase tracking-widest">Target</p><h2 id="target-num" class="game-title text-9xl -mt-2">0</h2></div>
                     <div id="tiles-container" class="grid grid-cols-3 gap-4"></div>
                 </div>`;
             } else {
                 root.innerHTML = `
                 <div class="glass-card text-center">
-                    <h2 class="game-title text-3xl mb-4">Time Up!</h2>
+                    <h2 class="game-title text-3xl mb-4 text-indigo-900 dark:text-indigo-400">Run Complete</h2>
                     <div class="game-title text-8xl text-indigo-600 mb-8">${state.score}</div>
                     <div class="space-y-3">
-                        <button onclick="shareToWhatsApp()" class="whatsapp-btn font-bold">Share on WhatsApp</button>
+                        <button onclick="shareScore()" class="whatsapp-btn font-bold"><span>🔥</span> Share My Score</button>
+                        <button onclick="shareInvite()" class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-3 rounded-2xl w-full font-bold text-sm border border-indigo-200">📢 Invite Friends to Play</button>
                         <button onclick="startGame()" class="btn-modern game-title">RETRY</button>
                     </div>
                     <button onclick="state.view='menu';renderBase()" class="mt-8 block w-full text-xs font-bold opacity-30 uppercase">Main Menu</button>
